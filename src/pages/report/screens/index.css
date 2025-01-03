@@ -1,0 +1,19 @@
+.ant-picker-input>input {
+    text-align: center;
+}
+
+.transition {
+    transition: width 0.2s ease-in-out;
+}
+
+.ant-picker-panels>*:not(:first-child) {
+    display: none !important;
+}
+
+.ant-picker-header-next-btn {
+    visibility: visible !important;
+}
+
+.ant-picker-header-super-next-btn {
+    visibility: visible !important;
+}

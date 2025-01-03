@@ -17,8 +17,7 @@ export default function ContextApp() : React.JSX.Element {
     )
 }
 ContextApp.Provider = function Provider(props:PropsWithChildren){
-    const [withSideBar,setWithSidebar] = useState(wSB)
-
+    const [withSideBar,setWithSidebar] = useState(60)
     return <Context.Provider value={{
         setWithSidebar,
         withSideBar

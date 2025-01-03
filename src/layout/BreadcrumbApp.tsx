@@ -1,9 +1,9 @@
-import { Breadcrumb } from "antd";
-import React, { EventHandler, memo } from "react";
-import { ALL_PATH } from "./SideBar";
-import { useLocation } from "react-router-dom";
-import { omit } from "lodash";
+import { Breadcrumb, Flex } from "antd";
 import { ItemType } from "antd/es/breadcrumb/Breadcrumb";
+import { omit } from "lodash";
+import React, { memo } from "react";
+import { useLocation } from "react-router-dom";
+import { ALL_PATH } from ".";
 
 const loopMap = (nest:string,path:string)=>function (e: Partial<(typeof ALL_PATH)[number]>) {
   const onClick :ItemType['onClick']=(e)=>{
@@ -40,6 +40,24 @@ export default memo(function BreadcrumbApp(): React.JSX.Element {
   const location =useLocation()
   // console.log((ALL_PATH.map(loopMap('/',location.pathname)).filter((r=>Object.keys(r).length))).map(mapChil).flat(5))
   return (
-    <Breadcrumb  items={(ALL_PATH.map(loopMap('/',location.pathname)).filter((r=>Object.keys(r).length))).map(mapChil).flat(5)} />
+    <Flex
+      align="center"
+      style={{
+        paddingInline:10,
+        background: "white",
+        zIndex: 1049,
+        position: "sticky",
+        top: 0,
+        height:30,
+
+      }}
+    >
+      <Breadcrumb
+        items={ALL_PATH.map(loopMap("/", location.pathname))
+          .filter((r) => Object.keys(r).length)
+          .map(mapChil)
+          .flat(5)}
+      />
+    </Flex>
   );
 })
