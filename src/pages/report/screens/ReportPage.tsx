@@ -1,14 +1,22 @@
 import { ConfigProvider, Flex, GetProp, Splitter } from "antd";
 import React, { PropsWithChildren, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Chart } from ".";
-import data from "./data.json";
-import dataSingle from "./dataSingle.json";
-import dataCountOrder from "./dataCountOrder";
 import vi from "antd/locale/vi_VN";
 import dayjs from "dayjs";
 import './index.css'
 import styled from "styled-components";
-import { getReportQuantity,getReportVoucher } from "../api";
+import {
+  getReportQuantityByDay,
+  getReportQuantityByMonth,
+  getReportQuantityByQuarter,
+  getReportQuantityByYear,
+  getReportQuantityByWeek,
+  getReportVoucherByWeek,
+  getReportVoucherByDay,
+  getReportVoucherByMonth,
+  getReportVoucherByQuarter,
+  getReportVoucherByYear,
+} from "../hook";
 dayjs.locale("vi");
 const Container = styled.div.attrs<{$size?:string}>((props)=>({
   type:'text',
@@ -16,79 +24,105 @@ const Container = styled.div.attrs<{$size?:string}>((props)=>({
 }))`
   height: ${({$size})=>`calc(100vh - ${$size}px)`};
 `
-type propsType = {};
-export default function ReportPage(props: propsType): React.JSX.Element {
-  const [layout, setLayout] =
-    useState<GetProp<typeof Splitter, "layout">>("horizontal");
+export default function ReportPage(): React.JSX.Element {
+  const [layout, setLayout] = useState<GetProp<typeof Splitter, "layout">>("horizontal");
   useLayoutEffect(() => {
     if (document.body.offsetWidth <= 1200) {
       setLayout("vertical");
     }
   }, []);
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [query, setQuery] = useState({});
 
- const memoizedCallback = useCallback( async(e={}) => {
-  try {
-    setLoading(true)
-    await getReportVoucher(new URLSearchParams(e).toString()).then(setData)
-  } catch (error) {
-    console.error('memoizedCallback',error);
-  } finally{
-    setLoading(false)
-  }}, [],
- );
- const memoizedCallback2 = useCallback( async(e={}) => {
-  try {
-    setLoading(true)
-    await getReportVoucher(new URLSearchParams({...e,typeDateReport:'QUARTER'}).toString()).then(setData2)
-  } catch (error) {
-    console.error('memoizedCallback',error);
-  } finally{
-    setLoading(false)
-  }}, [],
- );
+  const [dataReportOrder, setDataReportOrder] = useState<any[][]>([[],[],[],[]]);
+  const setDataReportOrderIndex = useCallback((idx:number)=> (e:any[])=>setDataReportOrder((old)=>{
+    old[idx]=e
+    return [...old]
+  }),[])
   useEffect(() => {
-    memoizedCallback()
-    memoizedCallback2()
-  }, []);
+    try {
+
+       async function init(){
+         const result = await Promise.allSettled([
+            getReportQuantityByDay(),
+            getReportQuantityByMonth(),
+            getReportVoucherByDay(),
+            getReportVoucherByQuarter()
+          ])
+
+          result.forEach((e,i)=>{
+            if(e.status==='fulfilled'){
+              setDataReportOrderIndex(i)(e.value)
+            }
+          })
+      }
+      
+      init()
+    } catch (error) {
+      console.error(error);
+    }
+
+  }, [setDataReportOrderIndex]);
   return (
     <ConfigProviderAntdComponent>
-      <style rel={'./index.css'}/>
+      <style rel={"./index.css"} />
       <Flex vertical className="bng">
-        <Container >
+        <Container>
           <Splitter layout={layout}>
             <Splitter.Panel min={layout === "horizontal" ? "30%" : "50%"}>
               <Splitter layout="vertical" style={{ height: "100%" }}>
                 <Splitter.Panel min={"30%"}>
                   <Chart
-                  loading={loading}
-                    title="Biểu đồ số lượng đơn khám | Tái Khám"
-                    data={data}
-                    onChange={(e)=>{
-                      // setQuery({
-                      //   startDate:e?.[0],
-                      //   endDate:e?.[1],
-                      // })
-                      memoizedCallback({
-                        startDate:e?.[0],
-                        endDate:e?.[1],
-                      })
-                      
-                      // setQuery(e)
+                    title="Số lượng lịch hẹn theo ngày"
+                    data={dataReportOrder[0]}
+                    onChange={(e) => {
+                      getReportQuantityByDay({
+                        startDate: e?.[0],
+                        endDate: e?.[1],
+                      }).then(setDataReportOrderIndex(0));
                     }}
                   />
                 </Splitter.Panel>
                 <Splitter.Panel min={"30%"}>
-                  <Chart title="Biểu đồ số lượng đơn hàng Khách lẻ | Doanh nghiệp" data={data2} />
+                  <Chart
+                    title="Số lượng lịch hẹn theo Tháng"
+                    data={dataReportOrder[1]}
+                    onChange={(e) => {
+                      getReportQuantityByMonth({
+                        startDate: e?.[0],
+                        endDate: e?.[1],
+                      }).then(setDataReportOrderIndex(1));
+                    }}
+                  />
                 </Splitter.Panel>
               </Splitter>
             </Splitter.Panel>
-            {/* <Splitter.Panel min={"30%"} style={{ height: "100%" }}>
-              <Chart title="Biểu đồ số lượng kết quả trả về" data={dataCountOrder} />
-            </Splitter.Panel> */}
+            <Splitter.Panel min={layout === "horizontal" ? "30%" : "50%"}>
+              <Splitter layout="vertical" style={{ height: "100%" }}>
+                <Splitter.Panel min={"30%"}>
+                  <Chart
+                    title="Báo cáo doanh số theo ngày"
+                    data={dataReportOrder[2]}
+                    onChange={(e) => {
+                      getReportVoucherByDay({
+                        startDate: e?.[0],
+                        endDate: e?.[1],
+                      }).then(setDataReportOrderIndex(2));
+                    }}
+                  />
+                </Splitter.Panel>
+                <Splitter.Panel min={"30%"}>
+                  <Chart
+                    title="Báo cáo doanh số theo quý"
+                    data={dataReportOrder[3]}
+                    onChange={(e) => {
+                      getReportVoucherByQuarter({
+                        startDate: e?.[0],
+                        endDate: e?.[1],
+                      }).then(setDataReportOrderIndex(3));
+                    }}
+                  />
+                </Splitter.Panel>
+              </Splitter>
+            </Splitter.Panel>
           </Splitter>
         </Container>
       </Flex>

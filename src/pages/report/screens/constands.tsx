@@ -55,9 +55,9 @@ export const OPTION_SELECT :GetProp<typeof Select,'options'> =[
     year: "year",
   } as const;
   export const TRANSLATE_TYPE_PIKER = {
-    date: "date",
-    month: "month",
-    quarter: "quarter",
-    week: "week",
-    year: "year",
+    date: "DAY",
+    month: "MONTH",
+    quarter: "QUARTER",
+    week: "WEEK",
+    year: "YEAR",
   } as const;

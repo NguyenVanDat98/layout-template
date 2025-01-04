@@ -1,9 +1,9 @@
 import axios from "axios"
 
  
- const getReportQuantity = async()=>{
+ const getReportQuantity = async(query:string='')=>{
     try {
-        const response = await axios.get('http://localhost:8555/api/v1/report-quantity-order')
+        const response = await axios.get('http://localhost:8555/api/v1/report-quantity-order?'+query);
         return response.data
     } catch (error) {
         console.error(error);
