@@ -12,20 +12,21 @@ import {
 } from "antd";
 import { get, omit, truncate, uniq } from "lodash";
 
-import { FilterOutlined } from "@ant-design/icons";
+import { FilterOutlined, SettingOutlined } from "@ant-design/icons";
 import React, { memo, PropsWithChildren, useState } from "react";
 import { OPTION_SELECT, TYPE_PICKER } from ".";
 
 type propsType = {
   data: any[];
-  title?: string;
+  title?: string | React.ReactNode ;
+  ExtendsTitle?: string | React.ReactNode ;
   loading?: boolean;
   onChange?: (p?:(string | undefined)[])=>void;
 };
 
 
 export type TYPE_PICKER_ = typeof TYPE_PICKER;
-export default function Chart({ data, title,loading, onChange}: propsType): React.JSX.Element {
+export default function Chart({ data, title,loading, onChange,ExtendsTitle}: propsType): React.JSX.Element {
   const [value, setSwitch] = useState<"grouped" | "stacked">("grouped");
   const [isTotal, setTotal] = useState<boolean>(false);
   const [picker, setPicker] = useState<
@@ -41,13 +42,13 @@ export default function Chart({ data, title,loading, onChange}: propsType): Reac
         paddingTop: 10,
       }}
     >
-      <Flex align="center" gap={10} style={{ height:52, minHeight:52 }}>
+      <Flex align="center" gap={10} style={{ height:52, minHeight:62,overflowX:'auto' }} wrap={false} >
         <Popover
           trigger={["click"]}
           placement="bottomLeft"
           content={
             <Flex style={{ width: 300 }} vertical gap={10}>
-              <Flex align="center">
+              <Flex align="center" >
                 <Strong>Type display:</Strong>
                 <Segmented
                   size="small"
@@ -56,28 +57,27 @@ export default function Chart({ data, title,loading, onChange}: propsType): Reac
                   }}
                   defaultValue="grouped"
                   options={[
-                    { value: "grouped", label: "grouped" },
-                    { value: "stacked", label: "stacked" },
+                    { value: "grouped", label: "Nhóm" },
+                    { value: "stacked", label: "Cột" },
                   ]}
                 />
               </Flex>
               <Flex align="center">
-                <Strong>Show Total:</Strong>
+                <Strong>Hiện tổng số:</Strong>
                 <Switch value={isTotal} onChange={setTotal} />
               </Flex>
             </Flex>
           }
         >
-          <Button size="small" type="primary">
-            Action
-          </Button>
+          <Button size="small" type="primary" icon={<SettingOutlined/>}> Hiển thị </Button>
         </Popover>
         <RenderFilter onChange={onChange ??function(e){}} setPicker={setPicker} picker={picker} />
+          {ExtendsTitle}
       </Flex>
 
       <div
         style={{
-          height: "calc(100% - 74px)",
+          height: "calc(100% - 80px)",
           width: "calc(100% - 10px)",
           border: "0.5px solid #333",
           borderRadius: 8,
@@ -87,10 +87,11 @@ export default function Chart({ data, title,loading, onChange}: propsType): Reac
         }}
       >
         <Flex align="center" gap={10} justify="center" style={{ height: 30 }}>
-          <Strong>{title}</Strong>
+          {title}
           {loading&& <Spin></Spin> }
         </Flex>
         <ResponsiveBar
+        
           data={data}
           keys={uniq(data.map((e) => Object.keys(omit(e, "_id"))).flat())}
           indexBy="_id"
@@ -190,7 +191,7 @@ const RenderFilter = memo(({
           size="small"
           type="primary"
           icon={<FilterOutlined />}
-        />
+        >Lọc</Button>
         <Flex gap={2} vertical style={{ width:open?'unset': 0,height:open?'unset': 0, overflowX:'hidden'}}>
           <Select
             popupMatchSelectWidth={false}
@@ -266,8 +267,8 @@ const RenderPicker = memo(({
 });
 function Strong(p: PropsWithChildren) {
   return (
-    <div style={{ }}>
-      <strong>{p.children}</strong>
+    <div style={{ width:'50%' }}>
+      <strong style={{whiteSpace:'none'}}>{p.children}</strong>
     </div>
   );
 }

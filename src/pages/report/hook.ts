@@ -41,12 +41,21 @@ const getReportQuantityByWeek =async(e={})=>{
         return []
     }
 }
+const getReportQuantityByCustom =async(e={})=>{
+    try {
+        return await getReportQuantity(new URLSearchParams({typeDateReport:TRANSLATE_TYPE_PIKER.date,...e}).toString())
+    } catch (error) {
+        console.error('getReportQuantityByCustom',)
+        return []
+    }
+}
 export {
     getReportQuantityByDay,
     getReportQuantityByMonth,
     getReportQuantityByQuarter,
     getReportQuantityByYear,
     getReportQuantityByWeek,
+    getReportQuantityByCustom
 }
 
 
@@ -91,6 +100,14 @@ const getReportVoucherByYear =async(e={})=>{
         return []
     }
 }
+const getReportVoucherByCustom =async(e={})=>{
+    try {
+        return await getReportVoucher(new URLSearchParams({typeDateReport:TRANSLATE_TYPE_PIKER.date,...e,}).toString())
+    } catch (error) {
+        console.error('getReportVoucherByCustom',)
+        return []
+    }
+}
 
 
 export {
@@ -99,4 +116,5 @@ export {
     getReportVoucherByMonth,
     getReportVoucherByQuarter,
     getReportVoucherByYear,
+    getReportVoucherByCustom,
 }

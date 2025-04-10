@@ -2,8 +2,11 @@ import {
   AppstoreOutlined,
   BarChartOutlined,
   CalculatorOutlined,
+  CalendarOutlined,
   MailOutlined,
+  OrderedListOutlined,
   SettingOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Table } from "antd";
@@ -11,6 +14,9 @@ import { get } from "lodash";
 import { ReactNode } from "react";
 import { ReportPage } from "../pages/report/screens";
 import { Homepage } from "../pages";
+import MyCalendar from "../pages/calender";
+import { OrderPage } from "../pages/order";
+import UploadPage from "../pages/upload";
 type MenuItem = Required<MenuProps>["items"][number];
 type SubMenuItem = MenuItem & {
   path?: string;
@@ -43,7 +49,31 @@ export const ALL_PATH = (
         icon: <CalculatorOutlined />,
         index:true,
         path: "paymentTransaction",
-        Component:<div>Payment Transaction</div>,
+        Component:<MyCalendar/>,
+      },
+      {
+        key: "appointments",
+        label: "Đặt hàng",
+        icon: <OrderedListOutlined />,
+        index:true,
+        path: "appointments",
+        Component:<OrderPage/>,
+      },
+      {
+        key: "upload",
+        label: "Tải lên",
+        icon: <UploadOutlined />,
+        index:true,
+        path: "upload",
+        Component:<UploadPage/>,
+      },
+      {
+        key: "calendar",
+        label: "Lịch hẹn",
+        icon: <CalendarOutlined />,
+        index:true,
+        path: "calendar",
+        Component:<MyCalendar/>,
       },
       {
         key: "setting",
